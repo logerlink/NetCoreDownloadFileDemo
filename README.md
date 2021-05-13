@@ -1,0 +1,2 @@
+# NetCoreDownloadFileDemo
+.NetCore常见的文件下载功能和文件上传功能、大文件分片上传
