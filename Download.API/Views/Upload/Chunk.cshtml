@@ -1,0 +1,70 @@
+﻿@{
+    ViewData["name"] = "大文件分片上传";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <input name="file" class="file" type="file" />
+    <input id="submit" type="button" value="分片上传" class="btn-submit" />
+</div>
+<script>
+    window.onload = function () {
+        let btnSubmit = document.querySelector('.btn-submit')
+        btnSubmit.addEventListener('click', () => {
+            UploadAsync()
+        })
+    }
+    async function UploadAsync() {
+        //目标文件
+        let file = document.querySelector('.file').files[0]
+        let fileChunks = []
+        //分片缓冲区
+        let maxFileSize = 8
+        let bufferChunkSize = maxFileSize * (1024 * 1024)
+        //读取文件流初始位置
+        let fileStreamPos = 0
+        //设置下一次读取缓冲区大小
+        let endPos = bufferChunkSize
+        //文件大小
+        let size = file.size
+        //将文件切片 装入数组
+        while (fileStreamPos < size) {
+            let fileChunkInfo = {
+                file: file.slice(fileStreamPos, endPos),     //切片 0-80 80-160
+                start: fileStreamPos,
+                end: endPos
+            }
+            //装入数组
+            fileChunks.push(fileChunkInfo)
+            //改变下一次读取开始的位置
+            fileStreamPos = endPos
+            //改变下一次读取结束的位置
+            endPos = fileStreamPos + bufferChunkSize
+        }
+        //分片数量
+        let totalParts = fileChunks.length
+        let partCount = 0
+        //循环所有片段 上传
+        while (chunk = fileChunks.shift()) {
+            partCount++
+            //自定义上传文件名称 并跟随chunk一起上传
+            let filePartName = file.name + ".partNumber-" + partCount
+            chunk.filePartName = filePartName
+            //url参数
+            let url = `partNumber=${partCount}&chunks=${totalParts}&size=${bufferChunkSize}&start=${chunk.start}&end=${chunk.end}&total=${size}`
+            chunk.urlParameter = url
+            UploadFileChunk(chunk)
+        }
+    }
+
+    function UploadFileChunk(chunk) {
+        let formData = new FormData()
+        formData.append('file', chunk.file, chunk.filePartName)
+        fetch('/Upload/chunk?' + chunk.urlParameter, {
+            method: 'post',
+            body: formData
+        }).then(res => {
+            console.log(res)
+        })
+    }
+</script>

@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["name"] = "多文件上传";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<p>
+    <input type="file" name="formFiles" class="file-multi" multiple>
+    <button type="button" class="btn-submit">多文件上传</button>
+</p>
+<script>
+    window.onload = function () {
+        let btnSubmit = document.querySelector('.btn-submit')
+        btnSubmit.addEventListener('click', () => {
+            UploadAsync()
+        })
+    }
+    async function UploadAsync() {
+        files = document.querySelector('.file-multi').files
+        const formData = new FormData()
+        //不可如此
+        //formData.append("files", files)
+        for (var i = 0; i < files.length; i++) {
+            //此处的key可随便设置 后台都可获取
+            formData.append("files", files[i])
+        }
+        console.log(formData)
+        fetch('/Upload/multi', { method: 'post', body: formData })
+            .then(res => {
+                console.log(res)
+            })
+    }
+</script>

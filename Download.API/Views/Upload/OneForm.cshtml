@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["name"] = "单文件表单上传";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form class="form-one">
+    <input type="file" name="formFile" class="file">
+    <button type="button" class="btn-submit">单文件表单上传</button>
+</form>
+<script>
+    window.onload = function () {
+        let btnSubmit = document.querySelector('.btn-submit')
+        btnSubmit.addEventListener('click', () => {
+            UploadAsync()
+        })
+    }
+    async function UploadAsync() {
+        form = document.querySelector('.form-one')
+        const formData = new FormData(form)
+        console.log(formData)
+        fetch('/Upload/oneForm', { method: 'post', body: formData })
+            .then(res => {
+                console.log(res)
+            })
+    }
+</script>

@@ -1,0 +1,36 @@
+﻿<script>
+    window.onload = function () {
+        let btnGet = document.querySelector('.btn-get')
+        btnGet.addEventListener('click', () => {
+            console.log('111111111')
+            location.href ="/Home/download"
+        })
+
+        let btnPost = document.querySelector('.btn-post')
+        btnPost.addEventListener('click', () => {
+            console.log('222222')
+            postDownLoad()
+        })
+    }
+    function postDownLoad() {
+        fetch('/Home/download1',
+            {
+                method: 'post',
+                headers: {}
+            })
+            .then(res => res.blob())    //res.arrayBuffer().也可以
+            .then(res => {
+                const link = document.createElement('a')
+                let blob = new Blob([res], { type: 'application/pdf' })
+                let url = URL.createObjectURL(blob)
+                link.href = url
+                link.download = 'ManYou.pdf'
+                link.click()
+            })
+    }
+</script>
+
+<button class="btn-get">Get DownLoad</button>
+<p></p>
+<button class="btn-post">Post download</button><br />
+

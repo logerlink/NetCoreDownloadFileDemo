@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["name"] = "Model组合上传";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+   多文件：
+<input type="file" name="formFiles" class="file-multi" multiple>
+   单文件：
+<input type="file" name="formFile" class="file">
+   用户名：
+<input type="text" name="username" class="text-username">
+<button type="button" class="btn-submit">Model组合上传</button>
+<script>
+    window.onload = function () {
+        let btnSubmit = document.querySelector('.btn-submit')
+        btnSubmit.addEventListener('click', () => {
+            UploadAsync()
+        })
+    }
+    async function UploadAsync() {
+        file = document.querySelector('.file').files[0]
+        formFiles = document.querySelector('.file-multi').files
+        var apiModel = {
+            username: document.querySelector('.text-username').value,
+        }
+        const formData = new FormData()
+        formData.append('apiModel', JSON.stringify(apiModel))   //可正常解析
+        formData.append('apiModel2', apiModel)                  //无法正常解析
+        formData.append('formFiles', formFiles)                 //无法正常获取文件
+        formData.append('formFile2', file)                      //可正常获取文件
+
+        //处理多文件  多文件必须通过for循环以一个一个加   
+        //不可直接formData.append('formFiles', formFiles) //无法正常获取文件
+        for (var i = 0; i < formFiles.length; i++) {
+            //此处的key可随便设置 后台都可获取
+            formData.append("files", formFiles[i])
+        }
+
+        console.log(apiModel)
+        fetch('/Upload/model', {
+            method: 'post',
+            body: formData,
+        })
+            .then(res => {
+                console.log(res)
+            })
+    }
+</script>
